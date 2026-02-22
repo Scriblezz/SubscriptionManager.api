@@ -43,44 +43,37 @@ namespace SubscriptionManager.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Subscription>> CreateSubscription(Subscription subscription, [FromServices] AppDbContext context)
+        public async Task<ActionResult<Subscription>> CreateSubscription(Subscription subscription)
         {
             // Call the service to create a new subscription
-            context.Subscriptions.Add(subscription);
-            await context.SaveChangesAsync();
+            _subscriptionService.CreateSubscriptionAsync(subscription);
             // Return the created subscription with a 201 Created response
             return CreatedAtAction(nameof(GetSubscriptionById), new { id = subscription.Id }, subscription);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSubscription(int id, Subscription subscription, [FromServices] AppDbContext context)
+        public async Task<IActionResult> UpdateSubscription(int id, Subscription subscription)
         {
             // Call the service to update the subscription
-            var existingSubscription = await context.Subscriptions.FindAsync(id);
+            var existingSubscription = await _subscriptionService.GetByIdAsync(id);
             if (existingSubscription == null)
             {
                 return NotFound();
             }
-            existingSubscription.Name = subscription.Name;
-            existingSubscription.Price = subscription.Price;
-            existingSubscription.Category = subscription.Category;
-            existingSubscription.IsActive = subscription.IsActive;
-            existingSubscription.NextRenewalDate = subscription.NextRenewalDate;
-            await context.SaveChangesAsync();
+            await _subscriptionService.UpdateSubscriptionAsync(id, subscription);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSubscription(int id, [FromServices] AppDbContext context)
+        public async Task<IActionResult> DeleteSubscription(int id)
         {
             // Call the service to delete the subscription
-            var subscription = await context.Subscriptions.FindAsync(id);
+            var subscription = await _subscriptionService.GetByIdAsync(id);
             if (subscription == null)
             {
                 return NotFound();
             }
-            context.Subscriptions.Remove(subscription);
-            await context.SaveChangesAsync();
+            await _subscriptionService.DeleteSubscriptionAsync(id);
             return NoContent();
         }
     }

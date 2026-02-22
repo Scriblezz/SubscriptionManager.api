@@ -22,4 +22,39 @@ public class SubscriptionService : ISubscriptionService
     {
         return await _context.Subscriptions.FirstOrDefaultAsync(s => s.Id == id);
     }
+
+    public async Task<Subscription> CreateSubscriptionAsync(Subscription subscription)
+    {
+        _context.Subscriptions.Add(subscription);
+        await _context.SaveChangesAsync();
+        return subscription;
+    }
+
+    public async Task<Subscription> UpdateSubscriptionAsync(int id, Subscription subscription)
+    {
+        var existingSubscription = await _context.Subscriptions.FindAsync(id);
+        if (existingSubscription == null)
+        {
+            return null;
+        }
+        existingSubscription.Name = subscription.Name;
+        existingSubscription.Price = subscription.Price;
+        existingSubscription.Category = subscription.Category;
+        existingSubscription.IsActive = subscription.IsActive;
+        existingSubscription.NextRenewalDate = subscription.NextRenewalDate;
+        await _context.SaveChangesAsync();
+        return existingSubscription;
+    }
+
+    public async Task<Subscription> DeleteSubscriptionAsync(int id)
+    {
+        var subscription = await _context.Subscriptions.FindAsync(id);
+        if (subscription == null)
+        {
+            return null;
+        }
+        _context.Subscriptions.Remove(subscription);
+        await _context.SaveChangesAsync();
+        return subscription;
+    }
 }
