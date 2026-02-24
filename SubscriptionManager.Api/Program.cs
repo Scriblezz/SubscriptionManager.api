@@ -1,6 +1,7 @@
 using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using SubscriptionManager.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

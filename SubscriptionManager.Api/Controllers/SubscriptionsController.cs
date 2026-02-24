@@ -76,5 +76,13 @@ namespace SubscriptionManager.Api.Controllers
             await _subscriptionService.DeleteSubscriptionAsync(id);
             return NoContent();
         }
+
+        [HttpPost("{id}/renew")]
+        public async Task<IActionResult> RenewSubscription(int id)
+        {
+            // Call the service to renew the subscription
+            var result = await _subscriptionService.RenewAsync(id);
+            return Ok(result);
+        }
     }
 }

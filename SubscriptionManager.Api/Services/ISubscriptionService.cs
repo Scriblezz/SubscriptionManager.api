@@ -13,5 +13,7 @@ namespace SubscriptionManager.Api.Services
         Task<Subscription> UpdateSubscriptionAsync(int id, Subscription subscription);
 
         Task<Subscription> DeleteSubscriptionAsync(int id);
+
+        Task<Subscription> RenewAsync(int id);
     }
 }

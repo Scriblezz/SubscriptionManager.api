@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Entities;
+using SubscriptionManager.Api.Exceptions;
 
 namespace SubscriptionManager.Api.Services;
 
@@ -54,6 +56,24 @@ public class SubscriptionService : ISubscriptionService
             return null;
         }
         _context.Subscriptions.Remove(subscription);
+        await _context.SaveChangesAsync();
+        return subscription;
+    }
+
+    public async Task<Subscription> RenewAsync(int id)
+    {
+        var subscription = await _context.Subscriptions.FindAsync(id);
+        if (subscription == null)
+        {
+            throw new NotFoundException("Subscription not found");
+        }
+        if (!subscription.IsActive)
+        {
+            throw new BadRequestException("Subscription is not active");
+        }
+        
+        subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.Now);
+        subscription.NextRenewalDate = subscription.NextRenewalDate.AddMonths(1);
         await _context.SaveChangesAsync();
         return subscription;
     }
