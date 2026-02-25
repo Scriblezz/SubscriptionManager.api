@@ -2,12 +2,19 @@ using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using SubscriptionManager.Api.Middleware;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Add controllers and services
 builder.Services.AddControllers();
