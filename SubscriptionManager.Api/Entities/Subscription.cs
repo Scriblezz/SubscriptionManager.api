@@ -8,5 +8,6 @@ namespace SubscriptionManager.Api.Entities
         public string Category { get; set; }
         public bool IsActive { get; set; }
         public DateTime NextRenewalDate { get; set; }
+        public DateOnly LastRenewalDate { get; set; }
     }
 }
