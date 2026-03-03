@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Entities;
 using SubscriptionManager.Api.Exceptions;
+using SubscriptionManager.Api.DTO.Subscriptions;
 
 namespace SubscriptionManager.Api.Services;
 
@@ -15,24 +16,27 @@ public class SubscriptionService : ISubscriptionService
         _context = context;
     }
 
-    public async Task<List<Subscription>> GetAllAsync()
+    public async Task<List<SubscriptionDTO>> GetAllAsync()
     {
-        return await _context.Subscriptions.AsNoTracking().ToListAsync();
+        var subs = await _context.Subscriptions.AsNoTracking().ToListAsync();
+        return subs.Select(ToResponse).ToList();
     }
 
-    public async Task<Subscription> GetByIdAsync(int id)
+    public async Task<SubscriptionDTO> GetByIdAsync(int id)
     {
-        return await _context.Subscriptions.FirstOrDefaultAsync(s => s.Id == id);
+        var sub = await _context.Subscriptions.AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Id == id);
+        return ToResponse(sub);
     }
 
-    public async Task<Subscription> CreateSubscriptionAsync(Subscription subscription)
+    public async Task<SubscriptionDTO> CreateSubscriptionAsync(Subscription subscription)
     {
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
-        return subscription;
+        return ToResponse(subscription);
     }
 
-    public async Task<Subscription> UpdateSubscriptionAsync(int id, Subscription subscription)
+    public async Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, Subscription subscription)
     {
         var existingSubscription = await _context.Subscriptions.FindAsync(id);
         if (existingSubscription == null)
@@ -47,10 +51,10 @@ public class SubscriptionService : ISubscriptionService
         existingSubscription.LastRenewalDate = subscription.LastRenewalDate;
         existingSubscription.BillingCycle = subscription.BillingCycle;
         await _context.SaveChangesAsync();
-        return existingSubscription;
+        return ToResponse(existingSubscription);
     }
 
-    public async Task<Subscription> DeleteSubscriptionAsync(int id)
+    public async Task<SubscriptionDTO> DeleteSubscriptionAsync(int id)
     {
         var subscription = await _context.Subscriptions.FindAsync(id);
         if (subscription == null)
@@ -59,10 +63,10 @@ public class SubscriptionService : ISubscriptionService
         }
         _context.Subscriptions.Remove(subscription);
         await _context.SaveChangesAsync();
-        return subscription;
+        return ToResponse(subscription);
     }
 
-    public async Task<Subscription> RenewAsync(int id)
+    public async Task<SubscriptionDTO> RenewAsync(int id)
     {
         var subscription = await _context.Subscriptions.FindAsync(id);
         // Check if the subscription exists
@@ -70,37 +74,55 @@ public class SubscriptionService : ISubscriptionService
         {
             throw new NotFoundException("Subscription not found");
         }
-        // Check if the subscription is active and has a valid billing cycle
-        if (!subscription.IsActive || subscription.BillingCycle == Unknown)
-        {
+        // Check if the subscription is active
+        if (!subscription.IsActive)
             throw new BadRequestException("Subscription is not active");
-        }
+        // Check if the billing cycle is valid
+        if (subscription.BillingCycle == BillingCycle.Unknown)
+            throw new BadRequestException("Subscription billing cycle is invalid");
         // Check if the subscription can be renewed based on the next renewal date
-        if (subscription.NextRenewalDate > DateTime.Now)
+        if (subscription.NextRenewalDate > DateTime.UtcNow)
         {
             throw new BadRequestException("Subscription cannot be renewed yet");
         }
 
         // Update the subscription's renewal dates based on the billing cycle
-        while (subscription.NextRenewalDate <= DateTime.Now)
+        while (subscription.NextRenewalDate <= DateTime.UtcNow)
         {
             if (subscription.BillingCycle == BillingCycle.Weekly)
             {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.Now);
+                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 subscription.NextRenewalDate = subscription.NextRenewalDate.AddDays(7);
             }
             else if (subscription.BillingCycle == BillingCycle.Yearly)
             {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.Now);
+                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 subscription.NextRenewalDate = subscription.NextRenewalDate.AddYears(1);
             }
             else if (subscription.BillingCycle == BillingCycle.Monthly)
             {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.Now);
+                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
                 subscription.NextRenewalDate = subscription.NextRenewalDate.AddMonths(1);
             }
         }
         await _context.SaveChangesAsync();
-        return subscription;
+        return ToResponse(subscription);
+    }
+
+    private static SubscriptionDTO ToResponse(Subscription s)
+    {
+        if (s == null) return null;
+
+        return new SubscriptionDTO
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Price = s.Price,
+            Category = s.Category,
+            IsActive = s.IsActive,
+            NextRenewalDate = s.NextRenewalDate,
+            LastRenewalDate = s.LastRenewalDate,
+            BillingCycle = s.BillingCycle
+        };
     }
 }

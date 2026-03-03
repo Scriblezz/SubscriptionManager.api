@@ -1,19 +1,20 @@
 using SubscriptionManager.Api.Entities;
+using SubscriptionManager.Api.DTO.Subscriptions;
 
 namespace SubscriptionManager.Api.Services
 {
     public interface ISubscriptionService
     {
-        Task<List<Subscription>> GetAllAsync();
+        Task<List<SubscriptionDTO>> GetAllAsync();
 
-        Task<Subscription> GetByIdAsync(int id);
+        Task<SubscriptionDTO> GetByIdAsync(int id);
 
-        Task<Subscription> CreateSubscriptionAsync(Subscription subscription);
+        Task<SubscriptionDTO> CreateSubscriptionAsync(Subscription subscription);
 
-        Task<Subscription> UpdateSubscriptionAsync(int id, Subscription subscription);
+        Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, Subscription subscription);
 
-        Task<Subscription> DeleteSubscriptionAsync(int id);
+        Task<SubscriptionDTO> DeleteSubscriptionAsync(int id);
 
-        Task<Subscription> RenewAsync(int id);
+        Task<SubscriptionDTO> RenewAsync(int id);
     }
 }
