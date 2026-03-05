@@ -9,12 +9,13 @@ namespace SubscriptionManager.Api.Services
 
         Task<SubscriptionDTO> GetByIdAsync(int id);
 
-        Task<SubscriptionDTO> CreateSubscriptionAsync(Subscription subscription);
+        Task<SubscriptionDTO> CreateSubscriptionAsync(SubscriptionCreateRequest subscription);
 
-        Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, Subscription subscription);
+        Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, SubscriptionUpdateRequest subscription);
 
         Task<SubscriptionDTO> DeleteSubscriptionAsync(int id);
 
         Task<SubscriptionDTO> RenewAsync(int id);
+
     }
 }

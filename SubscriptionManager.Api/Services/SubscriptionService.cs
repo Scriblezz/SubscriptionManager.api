@@ -33,15 +33,33 @@ public class SubscriptionService : ISubscriptionService
         return ToResponse(sub);
     }
 
-    public async Task<SubscriptionDTO> CreateSubscriptionAsync(Subscription subscription)
+    public async Task<SubscriptionDTO> CreateSubscriptionAsync(SubscriptionCreateRequest subscription)
     {
+        if (subscription.BillingCycle == BillingCycle.Unknown)
+        {
+            throw new BadRequestException("Invalid billing cycle");
+        }
+        var now = DateTime.UtcNow;
 
-        _context.Subscriptions.Add(subscription);
+        var newSubscription = new Subscription
+        {
+            Name = subscription.Name,
+            Price = subscription.Price,
+            Category = subscription.Category,
+            BillingCycle = subscription.BillingCycle,
+
+            IsActive = true,
+            LastRenewalDate = null,
+            NextRenewalDate = GetInitialNextRenewalDate(now, subscription.BillingCycle)
+        };
+
+        _context.Subscriptions.Add(newSubscription);
         await _context.SaveChangesAsync();
-        return ToResponse(subscription);
+
+        return ToResponse(newSubscription);
     }
 
-    public async Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, Subscription subscription)
+    public async Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, SubscriptionUpdateRequest subscription)
     {
         var existingSubscription = await _context.Subscriptions.FindAsync(id);
         if (existingSubscription == null)
@@ -52,8 +70,6 @@ public class SubscriptionService : ISubscriptionService
         existingSubscription.Price = subscription.Price;
         existingSubscription.Category = subscription.Category;
         existingSubscription.IsActive = subscription.IsActive;
-        existingSubscription.NextRenewalDate = subscription.NextRenewalDate;
-        existingSubscription.LastRenewalDate = subscription.LastRenewalDate;
         existingSubscription.BillingCycle = subscription.BillingCycle;
         await _context.SaveChangesAsync();
         return ToResponse(existingSubscription);
@@ -123,6 +139,17 @@ public class SubscriptionService : ISubscriptionService
             NextRenewalDate = s.NextRenewalDate,
             LastRenewalDate = s.LastRenewalDate,
             BillingCycle = s.BillingCycle
+        };
+    }
+
+    private static DateTime GetInitialNextRenewalDate(DateTime now, BillingCycle billingCycle)
+    {
+        return billingCycle switch
+        {
+            BillingCycle.Weekly => now.AddDays(7),
+            BillingCycle.Monthly => now.AddMonths(1),
+            BillingCycle.Yearly => now.AddYears(1),
+            _ => throw new BadRequestException("Invalid billing cycle")
         };
     }
 }

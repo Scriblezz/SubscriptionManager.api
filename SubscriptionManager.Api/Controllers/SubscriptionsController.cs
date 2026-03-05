@@ -37,19 +37,19 @@ namespace SubscriptionManager.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<SubscriptionDTO>> CreateSubscription(Subscription subscription)
+        public async Task<ActionResult<SubscriptionDTO>> CreateSubscription(SubscriptionCreateRequest request)
         {
             // Call the service to create a new subscription
-            var created = await _subscriptionService.CreateSubscriptionAsync(subscription);
+            var created = await _subscriptionService.CreateSubscriptionAsync(request);
             // Return the created subscription with a 201 Created response
-            return CreatedAtAction(nameof(GetSubscriptionById), new { id = subscription.Id }, subscription);
+            return CreatedAtAction(nameof(GetSubscriptionById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSubscription(int id, Subscription subscription)
+        public async Task<IActionResult> UpdateSubscription(int id, SubscriptionUpdateRequest request)
         {
             // Call the service to update the subscription
-            var updated = await _subscriptionService.UpdateSubscriptionAsync(id, subscription);
+            var updated = await _subscriptionService.UpdateSubscriptionAsync(id, request);
             return Ok(updated);
         }
 
