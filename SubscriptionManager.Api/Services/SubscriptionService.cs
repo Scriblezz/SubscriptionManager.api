@@ -26,11 +26,16 @@ public class SubscriptionService : ISubscriptionService
     {
         var sub = await _context.Subscriptions.AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id);
+        if (sub == null)
+        {
+            throw new NotFoundException($"Subscription {id} not found");
+        }
         return ToResponse(sub);
     }
 
     public async Task<SubscriptionDTO> CreateSubscriptionAsync(Subscription subscription)
     {
+
         _context.Subscriptions.Add(subscription);
         await _context.SaveChangesAsync();
         return ToResponse(subscription);
@@ -41,7 +46,7 @@ public class SubscriptionService : ISubscriptionService
         var existingSubscription = await _context.Subscriptions.FindAsync(id);
         if (existingSubscription == null)
         {
-            return null;
+            throw new NotFoundException("No subscription found");
         }
         existingSubscription.Name = subscription.Name;
         existingSubscription.Price = subscription.Price;
@@ -59,7 +64,7 @@ public class SubscriptionService : ISubscriptionService
         var subscription = await _context.Subscriptions.FindAsync(id);
         if (subscription == null)
         {
-            return null;
+            throw new NotFoundException("No subscription found");
         }
         _context.Subscriptions.Remove(subscription);
         await _context.SaveChangesAsync();
@@ -89,21 +94,17 @@ public class SubscriptionService : ISubscriptionService
         // Update the subscription's renewal dates based on the billing cycle
         while (subscription.NextRenewalDate <= DateTime.UtcNow)
         {
-            if (subscription.BillingCycle == BillingCycle.Weekly)
+            var last = subscription.NextRenewalDate;
+
+            subscription.NextRenewalDate = subscription.BillingCycle switch
             {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                subscription.NextRenewalDate = subscription.NextRenewalDate.AddDays(7);
-            }
-            else if (subscription.BillingCycle == BillingCycle.Yearly)
-            {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                subscription.NextRenewalDate = subscription.NextRenewalDate.AddYears(1);
-            }
-            else if (subscription.BillingCycle == BillingCycle.Monthly)
-            {
-                subscription.LastRenewalDate = DateOnly.FromDateTime(DateTime.UtcNow);
-                subscription.NextRenewalDate = subscription.NextRenewalDate.AddMonths(1);
-            }
+                BillingCycle.Weekly => subscription.NextRenewalDate.AddDays(7),
+                BillingCycle.Monthly => subscription.NextRenewalDate.AddMonths(1),
+                BillingCycle.Yearly => subscription.NextRenewalDate.AddYears(1),
+                _ => throw new BadRequestException("Subscription billing cycle is invalid")
+            };
+
+            subscription.LastRenewalDate = DateOnly.FromDateTime(last);
         }
         await _context.SaveChangesAsync();
         return ToResponse(subscription);
@@ -111,7 +112,6 @@ public class SubscriptionService : ISubscriptionService
 
     private static SubscriptionDTO ToResponse(Subscription s)
     {
-        if (s == null) return null;
 
         return new SubscriptionDTO
         {

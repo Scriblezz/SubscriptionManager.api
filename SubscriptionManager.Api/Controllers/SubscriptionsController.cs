@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Services;
 using SubscriptionManager.Api.Entities;
 using SubscriptionManager.Api.DTO.Subscriptions;
@@ -35,7 +33,6 @@ namespace SubscriptionManager.Api.Controllers
         {
             // Call the service to get the subscription by ID
             var subscription = await _subscriptionService.GetByIdAsync(id);
-            if (subscription == null) return NotFound();
             return Ok(subscription);
         }
 
@@ -53,7 +50,6 @@ namespace SubscriptionManager.Api.Controllers
         {
             // Call the service to update the subscription
             var updated = await _subscriptionService.UpdateSubscriptionAsync(id, subscription);
-            if (updated == null) return NotFound();
             return Ok(updated);
         }
 
@@ -62,7 +58,6 @@ namespace SubscriptionManager.Api.Controllers
         {
             // Call the service to delete the subscription
             var deleted = await _subscriptionService.DeleteSubscriptionAsync(id);
-            if (deleted == null) return NotFound();
             return Ok(deleted);
         }
 
