@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Entities;
@@ -33,9 +32,9 @@ public class SubscriptionService : ISubscriptionService
         return ToResponse(sub);
     }
 
-    public async Task<SubscriptionDTO> CreateSubscriptionAsync(SubscriptionCreateRequest subscription)
+    public async Task<SubscriptionDTO> CreateSubscriptionAsync(SubscriptionCreateRequest request)
     {
-        if (subscription.BillingCycle == BillingCycle.Unknown)
+        if (request.BillingCycle!.Value == BillingCycle.Unknown)
         {
             throw new BadRequestException("Invalid billing cycle");
         }
@@ -43,14 +42,14 @@ public class SubscriptionService : ISubscriptionService
 
         var newSubscription = new Subscription
         {
-            Name = subscription.Name,
-            Price = subscription.Price,
-            Category = subscription.Category,
-            BillingCycle = subscription.BillingCycle,
+            Name = request.Name,
+            Price = request.Price,
+            Category = request.Category,
+            BillingCycle = request.BillingCycle.Value,
 
             IsActive = true,
             LastRenewalDate = null,
-            NextRenewalDate = GetInitialNextRenewalDate(now, subscription.BillingCycle)
+            NextRenewalDate = GetInitialNextRenewalDate(now, request.BillingCycle.Value)
         };
 
         _context.Subscriptions.Add(newSubscription);
@@ -59,19 +58,27 @@ public class SubscriptionService : ISubscriptionService
         return ToResponse(newSubscription);
     }
 
-    public async Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, SubscriptionUpdateRequest subscription)
+    public async Task<SubscriptionDTO> UpdateSubscriptionAsync(int id, SubscriptionUpdateRequest request)
     {
         var existingSubscription = await _context.Subscriptions.FindAsync(id);
         if (existingSubscription == null)
         {
-            throw new NotFoundException("No subscription found");
+            throw new NotFoundException($"Subscription {id} not found");
         }
-        existingSubscription.Name = subscription.Name;
-        existingSubscription.Price = subscription.Price;
-        existingSubscription.Category = subscription.Category;
-        existingSubscription.IsActive = subscription.IsActive;
-        existingSubscription.BillingCycle = subscription.BillingCycle;
+
+        if (request.BillingCycle!.Value == BillingCycle.Unknown)
+        {
+            throw new BadRequestException("Invalid billing cycle");
+        }
+
+        existingSubscription.Name = request.Name;
+        existingSubscription.Price = request.Price;
+        existingSubscription.Category = request.Category;
+        existingSubscription.IsActive = request.IsActive;
+        existingSubscription.BillingCycle = request.BillingCycle.Value;
+
         await _context.SaveChangesAsync();
+
         return ToResponse(existingSubscription);
     }
 
@@ -80,7 +87,7 @@ public class SubscriptionService : ISubscriptionService
         var subscription = await _context.Subscriptions.FindAsync(id);
         if (subscription == null)
         {
-            throw new NotFoundException("No subscription found");
+            throw new NotFoundException($"Subscription {id} not found");
         }
         _context.Subscriptions.Remove(subscription);
         await _context.SaveChangesAsync();
