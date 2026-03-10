@@ -15,9 +15,31 @@ public class SubscriptionService : ISubscriptionService
         _context = context;
     }
 
-    public async Task<List<SubscriptionDTO>> GetAllAsync()
+    public async Task<List<SubscriptionDTO>> GetAllAsync(int page, int pageSize)
     {
-        var subs = await _context.Subscriptions.AsNoTracking().ToListAsync();
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize < 1)
+        {
+            pageSize = 10;
+        }
+
+        if (pageSize > 100)
+        {
+            pageSize = 100;
+        }
+
+        var skip = (page - 1) * pageSize;
+
+        var subs = await _context.Subscriptions
+            .OrderBy(s => s.Id)
+            .Skip(skip)
+            .Take(pageSize)
+            .ToListAsync();
+
         return subs.Select(ToResponse).ToList();
     }
 

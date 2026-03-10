@@ -5,7 +5,7 @@ namespace SubscriptionManager.Api.Services
 {
     public interface ISubscriptionService
     {
-        Task<List<SubscriptionDTO>> GetAllAsync();
+        Task<List<SubscriptionDTO>> GetAllAsync(int page, int pageSize);
 
         Task<SubscriptionDTO> GetByIdAsync(int id);
 
