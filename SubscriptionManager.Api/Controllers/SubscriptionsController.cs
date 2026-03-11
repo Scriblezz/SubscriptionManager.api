@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SubscriptionManager.Api.Services;
 using SubscriptionManager.Api.Entities;
 using SubscriptionManager.Api.DTO.Subscriptions;
+using SubscriptionManager.Api.DTOs.Common;
 
 namespace SubscriptionManager.Api.Controllers
 {
@@ -19,7 +20,7 @@ namespace SubscriptionManager.Api.Controllers
 
         // GET: api/subscriptions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SubscriptionDTO>>> GetAllSubscriptions(
+        public async Task<ActionResult<PagedResponse<SubscriptionDTO>>> GetAllSubscriptions(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {

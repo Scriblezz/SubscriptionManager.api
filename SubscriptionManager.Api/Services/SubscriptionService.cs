@@ -3,6 +3,7 @@ using SubscriptionManager.Api.Data;
 using SubscriptionManager.Api.Entities;
 using SubscriptionManager.Api.Exceptions;
 using SubscriptionManager.Api.DTO.Subscriptions;
+using SubscriptionManager.Api.DTOs.Common;
 
 namespace SubscriptionManager.Api.Services;
 
@@ -15,7 +16,7 @@ public class SubscriptionService : ISubscriptionService
         _context = context;
     }
 
-    public async Task<List<SubscriptionDTO>> GetAllAsync(int page, int pageSize)
+    public async Task<PagedResponse<SubscriptionDTO>> GetAllAsync(int page, int pageSize)
     {
         if (page < 1)
         {
@@ -32,6 +33,8 @@ public class SubscriptionService : ISubscriptionService
             pageSize = 100;
         }
 
+        var totalCount = await _context.Subscriptions.CountAsync();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         var skip = (page - 1) * pageSize;
 
         var subs = await _context.Subscriptions
@@ -40,7 +43,14 @@ public class SubscriptionService : ISubscriptionService
             .Take(pageSize)
             .ToListAsync();
 
-        return subs.Select(ToResponse).ToList();
+        return new PagedResponse<SubscriptionDTO>
+        {
+            Items = subs.Select(ToResponse).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
     }
 
     public async Task<SubscriptionDTO> GetByIdAsync(int id)

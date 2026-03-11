@@ -1,11 +1,12 @@
 using SubscriptionManager.Api.Entities;
+using SubscriptionManager.Api.DTOs.Common;
 using SubscriptionManager.Api.DTO.Subscriptions;
 
 namespace SubscriptionManager.Api.Services
 {
     public interface ISubscriptionService
     {
-        Task<List<SubscriptionDTO>> GetAllAsync(int page, int pageSize);
+        Task<PagedResponse<SubscriptionDTO>> GetAllAsync(int page, int pageSize);
 
         Task<SubscriptionDTO> GetByIdAsync(int id);
 
