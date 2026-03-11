@@ -16,7 +16,7 @@ public class SubscriptionService : ISubscriptionService
         _context = context;
     }
 
-    public async Task<PagedResponse<SubscriptionDTO>> GetAllAsync(int page, int pageSize)
+    public async Task<PagedResponse<SubscriptionDTO>> GetAllAsync(string? category, bool? isActive, int page, int pageSize)
     {
         if (page < 1)
         {
@@ -33,11 +33,23 @@ public class SubscriptionService : ISubscriptionService
             pageSize = 100;
         }
 
-        var totalCount = await _context.Subscriptions.CountAsync();
+        var query = _context.Subscriptions.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(s => s.Category == category);
+        }
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(s => s.IsActive == isActive.Value);
+        }
+
+        var totalCount = await query.CountAsync();
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         var skip = (page - 1) * pageSize;
 
-        var subs = await _context.Subscriptions
+        var subs = await query
             .OrderBy(s => s.Id)
             .Skip(skip)
             .Take(pageSize)

@@ -6,7 +6,7 @@ namespace SubscriptionManager.Api.Services
 {
     public interface ISubscriptionService
     {
-        Task<PagedResponse<SubscriptionDTO>> GetAllAsync(int page, int pageSize);
+        Task<PagedResponse<SubscriptionDTO>> GetAllAsync(string? category, bool? isActive, int page, int pageSize);
 
         Task<SubscriptionDTO> GetByIdAsync(int id);
 

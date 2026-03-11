@@ -21,11 +21,13 @@ namespace SubscriptionManager.Api.Controllers
         // GET: api/subscriptions
         [HttpGet]
         public async Task<ActionResult<PagedResponse<SubscriptionDTO>>> GetAllSubscriptions(
+            [FromQuery] string? category,
+            [FromQuery] bool? isActive,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
             // Call the service to get all subscriptions
-            var subscriptions = await _subscriptionService.GetAllAsync(page, pageSize);
+            var subscriptions = await _subscriptionService.GetAllAsync(category, isActive, page, pageSize);
             // Return the subscriptions as the response
             return Ok(subscriptions);
         }
