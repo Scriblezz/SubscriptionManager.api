@@ -16,7 +16,7 @@ public class SubscriptionService : ISubscriptionService
         _context = context;
     }
 
-    public async Task<PagedResponse<SubscriptionDTO>> GetAllAsync(string? category, bool? isActive, int page, int pageSize)
+    public async Task<PagedResponse<SubscriptionDTO>> GetAllAsync(string? category, bool? isActive, string? sortBy, string? sortDirection, int page, int pageSize)
     {
         if (page < 1)
         {
@@ -45,12 +45,56 @@ public class SubscriptionService : ISubscriptionService
             query = query.Where(s => s.IsActive == isActive.Value);
         }
 
+        // Sorting defaults
+        var normalizedSortBy = sortBy?.Trim().ToLower();
+        var normalizedSortDirection = sortDirection?.Trim().ToLower() ?? "asc";
+
+        if (normalizedSortDirection != "asc" && normalizedSortDirection != "desc")
+        {
+            throw new BadRequestException("sortDirection must be either 'asc' or 'desc'.");
+        }
+
+        var isDescending = normalizedSortDirection == "desc";
+
+        // Sorting
+        switch (normalizedSortBy)
+        {
+            case null:
+            case "":
+                query = isDescending
+                    ? query.OrderByDescending(s => s.Id)
+                    : query.OrderBy(s => s.Id);
+                break;
+
+            case "name":
+                query = isDescending
+                    ? query.OrderByDescending(s => s.Name)
+                    : query.OrderBy(s => s.Name);
+                break;
+
+            case "price":
+                query = isDescending
+                    ? query.OrderByDescending(s => s.Price)
+                    : query.OrderBy(s => s.Price);
+                break;
+
+            case "nextrenewaldate":
+                query = isDescending
+                    ? query.OrderByDescending(s => s.NextRenewalDate)
+                    : query.OrderBy(s => s.NextRenewalDate);
+                break;
+
+            default:
+                throw new BadRequestException(
+                    "Invalid sortBy value. Allowed values are: name, price, nextRenewalDate, createdAt.");
+        }
+
+
         var totalCount = await query.CountAsync();
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         var skip = (page - 1) * pageSize;
 
         var subs = await query
-            .OrderBy(s => s.Id)
             .Skip(skip)
             .Take(pageSize)
             .ToListAsync();
