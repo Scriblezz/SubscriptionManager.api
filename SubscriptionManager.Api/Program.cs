@@ -20,6 +20,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
