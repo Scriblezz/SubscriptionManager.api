@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\SubscriptionManager.Api\\Controllers",
+    "\\SubscriptionManager.Api\\DTO",
+    "\\SubscriptionManager.Api\\DTO\\Users",
+    "\\SubscriptionManager.Api\\Entities",
+    "\\SubscriptionManager.Api\\Exceptions",
+    "\\SubscriptionManager.Api\\Middleware",
+    "\\SubscriptionManager.Api\\Services"
+  ],
+  "SelectedNode": "\\SubscriptionManager.Api",
+  "PreviewInSolutionExplorer": false
+}
