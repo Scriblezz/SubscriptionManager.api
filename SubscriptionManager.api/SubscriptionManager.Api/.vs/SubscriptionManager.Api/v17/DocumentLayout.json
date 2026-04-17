@@ -47,8 +47,7 @@
               "RelativeToolTip": "Controllers\\AuthController.cs",
               "ViewState": "AgIAAAcAAACAZ2ZmZmYkwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T16:33:09.211Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T16:33:09.211Z"
             },
             {
               "$type": "Document",
@@ -60,8 +59,7 @@
               "RelativeToolTip": "Services\\AuthService.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAEAlwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T16:32:58.701Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T16:32:58.701Z"
             }
           ]
         }
