@@ -38,7 +38,7 @@ function Subscriptions() {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new error("Unable to add Subscription")
+      throw new Error("Unable to add Subscription")
       return
     }
 
@@ -51,6 +51,24 @@ function Subscriptions() {
     getSubscriptions();
   }
 
+async function deleteSubscription(id){
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:5001/api/Subscriptions/${id}`, {
+    method: "DELETE",
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+    }
+  })
+
+
+  if (!response.ok)
+  {
+    throw new Error("Unable to delete Subscription")
+  }
+
+  getSubscriptions();
+}
   function toggleField() {
     setShowForm(prev => !prev);
   }
@@ -64,7 +82,10 @@ function Subscriptions() {
       <h1>Subscriptions</h1>
       <ul style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '100px' }}>
         {subscriptions.map((sub) => (
-          <li key={sub.id}>Streaming Service: {sub.name}, Price: ${sub.price}, Category: {sub.category}, Billing Cycle: {sub.billingCycle}</li>
+        <div key={sub.id}>
+          <li>Streaming Service: {sub.name}, Price: ${sub.price}, Category: {sub.category}, Billing Cycle: {sub.billingCycle} </li>
+          <button onClick={() => deleteSubscription(sub.id)}>Delete</button>
+        </div>
         ))}
       </ul>
       {showForm && (
