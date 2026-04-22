@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom";
 function Subscriptions() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [name, setName] = useState('')
@@ -6,6 +7,7 @@ function Subscriptions() {
   const [category, setCategory] = useState('')
   const [billingCycle, setBillingCycle] = useState('')
   const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate()
   async function getSubscriptions() {
     const token = localStorage.getItem("token");
     const response = await fetch('http://localhost:5001/api/Subscriptions', {
@@ -69,6 +71,11 @@ async function deleteSubscription(id){
 
   getSubscriptions();
 }
+
+function logout(){
+  localStorage.removeItem('token')
+  navigate("/login")
+}
   function toggleField() {
     setShowForm(prev => !prev);
   }
@@ -129,6 +136,8 @@ async function deleteSubscription(id){
       <button onClick={toggleField}>
         {showForm ? "Cancel" : "Add Subscription"}
       </button>
+
+      <button onClick={logout}>Logout</button>
     </div>
   )
 }
