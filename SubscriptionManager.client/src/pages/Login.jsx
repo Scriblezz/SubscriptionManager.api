@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-function Login() {
+function Login({toggleDark, isDark}) {
+    console.log('toggleDark:', toggleDark, 'isDark', isDark)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('');
@@ -31,8 +32,13 @@ function Login() {
     }
     return (
         
-       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded shadow-md">
+       <div className="relative flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+        <button
+            onClick={toggleDark}
+            className="absolute top-4 right-4 bg-gray-200 dark:bg-gray-700 dark:text-white px-3 py-1 rounded">
+                {isDark ? 'Dark Mode' : 'Light Mode'}
+            </button>
+        <div className="bg-white dark:bg-gray-800 p-8 rounded shadow-md dark:text-white">
                 <h1 className="text-3xl font-bold mb-6">Login</h1>
                 <div className="flex flex-col mb-4">
                 <label className="mb-1 text-sm font-medium">Email:</label>
@@ -43,11 +49,11 @@ function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                 />
             </div>
-            <div className="flex flex-col mb-4">
-                <label className="mb-1 text-sm font-medium">Password:</label>
+            <div className="flex flex-col mb-4 dark:text-white">
+                <label className="mb-1 text-sm font-medium ">Password:</label>
                 <input  className="border border-gray-300 rounded px-3 py-2 w-64 focus:outline-none focus:border-blue-500"
                     type="password"
-                    placeholder="please enter your password"
+                    placeholder="Please enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
