@@ -187,7 +187,7 @@ function Subscriptions({ toggleDark, isDark }) {
         </ul>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 flex justify-end">
         <button
           onClick={toggleField}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4">
@@ -195,42 +195,54 @@ function Subscriptions({ toggleDark, isDark }) {
         </button>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded shadow flex flex-col gap-4 w-96">
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium">Name:</label>
-              <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                type="text" placeholder="Netflix" value={name}
-                onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium">Price:</label>
-              <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                type="number" step="0.01" placeholder="14.99" value={price}
-                onChange={(e) => setPrice(e.target.value)} />
-            </div>
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium">Category:</label>
-              <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                type="text" placeholder="Entertainment" value={category}
-                onChange={(e) => setCategory(e.target.value)} />
-            </div>
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium">Billing Cycle:</label>
-              <select
-                className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                value={billingCycle}
-                onChange={(e) => setBillingCycle(e.target.value)}>
-                <option value="">Select a billing cycle</option>
-                <option value="Weekly">Weekly</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Yearly">Yearly</option>
-              </select>
-            </div>
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              Save Subscription
-            </button>
-          </form>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={toggleField}
+          />
         )}
+        <div className={`fixed right-0 top-0 h-full w-96 bg-white dark:bg-gray-800 dark:text-white shadow-xl z-50 transform transition-transform duration-300 ${showForm ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="p-6 flex flex-col gap-4">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-bold">{editingId ? 'Edit Subscription' : 'Add Subscription'}</h2>
+              <button onClick={toggleField} className="text-gray-500 hover:text-gray-700 dark:text-gray-400">✕</button>
+            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium">Name:</label>
+                <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                  type="text" placeholder="Netflix" value={name}
+                  onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium">Price:</label>
+                <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                  type="number" step="0.01" placeholder="14.99" value={price}
+                  onChange={(e) => setPrice(e.target.value)} />
+              </div>
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium">Category:</label>
+                <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                  type="text" placeholder="Entertainment" value={category}
+                  onChange={(e) => setCategory(e.target.value)} />
+              </div>
+              <div className="flex flex-col">
+                <label className="mb-1 text-sm font-medium">Billing Cycle:</label>
+                <select
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                  value={billingCycle}
+                  onChange={(e) => setBillingCycle(e.target.value)}>
+                  <option value="">Select a billing cycle</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Monthly">Monthly</option>
+                  <option value="Yearly">Yearly</option>
+                </select>
+              </div>
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Save Subscription
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   )

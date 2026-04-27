@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div className={isDark ? 'dark' : ''}>
-      <Toaster position="top-right" />
+      <Toaster position="bottom-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
