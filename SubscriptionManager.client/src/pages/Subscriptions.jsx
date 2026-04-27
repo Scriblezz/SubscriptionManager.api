@@ -10,9 +10,11 @@ function Subscriptions({ toggleDark, isDark }) {
   const [billingCycle, setBillingCycle] = useState('')
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate()
 
   async function getSubscriptions() {
+    setIsLoading(true);
     const token = localStorage.getItem("token");
     const response = await fetch('http://localhost:5001/api/Subscriptions', {
       method: "GET",
@@ -26,6 +28,7 @@ function Subscriptions({ toggleDark, isDark }) {
     }
     const data = await response.json();
     setSubscriptions(data.items);
+    setIsLoading(false);
   }
 
   async function handleSubmit(e) {
@@ -146,36 +149,43 @@ function Subscriptions({ toggleDark, isDark }) {
           </button>
         </div>
       </div>
-      <ul className="flex flex-col gap-4">
-        {subscriptions.map((sub) => (
-          <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center">
-            <div>
-              <p className="font-bold">{sub.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">${sub.price} · {sub.category} · {sub.billingCycle}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Next Renewal: {new Date(sub.nextRenewalDate).toLocaleDateString("en-US")}</p>
-            </div>
-            <div className="flex gap-2">
-              {sub.isActive && new Date(sub.nextRenewalDate) < new Date() && (
+
+      {isLoading ? (
+        <div className="flex justify-center mt-20">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-4">
+          {subscriptions.map((sub) => (
+            <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center">
+              <div>
+                <p className="font-bold">{sub.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">${sub.price} · {sub.category} · {sub.billingCycle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Next Renewal: {new Date(sub.nextRenewalDate).toLocaleDateString("en-US")}</p>
+              </div>
+              <div className="flex gap-2">
+                {sub.isActive && new Date(sub.nextRenewalDate) < new Date() && (
+                  <button
+                    onClick={() => renewSubscription(sub.id)}
+                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                    Renew
+                  </button>
+                )}
                 <button
-                  onClick={() => renewSubscription(sub.id)}
-                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                  Renew
+                  onClick={() => startEdit(sub)}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                  Edit
                 </button>
-              )}
-              <button
-                onClick={() => startEdit(sub)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                Edit
-              </button>
-              <button
-                onClick={() => deleteSubscription(sub.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                Delete
-              </button>
+                <button
+                  onClick={() => deleteSubscription(sub.id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                  Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </ul>
+          ))}
+        </ul>
+      )}
 
       <div className="mt-6">
         <button
