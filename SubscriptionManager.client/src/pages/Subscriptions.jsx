@@ -8,6 +8,7 @@ function Subscriptions({ toggleDark, isDark }) {
   const [category, setCategory] = useState('')
   const [billingCycle, setBillingCycle] = useState('')
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const navigate = useNavigate()
 
   async function getSubscriptions() {
@@ -24,10 +25,24 @@ function Subscriptions({ toggleDark, isDark }) {
     const data = await response.json();
     setSubscriptions(data.items);
   }
+  
+async function handleSubmit(e) {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
 
-  async function addSubscription(e) {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
+  if (editingId) {
+    const response = await fetch(`http://localhost:5001/api/Subscriptions/${editingId}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, price, category, billingCycle })
+    })
+    if (!response.ok) {
+      throw new Error("Unable to edit Subscription")
+    }
+  } else {
     const response = await fetch("http://localhost:5001/api/Subscriptions", {
       method: "POST",
       headers: {
@@ -36,17 +51,19 @@ function Subscriptions({ toggleDark, isDark }) {
       },
       body: JSON.stringify({ name, price, category, billingCycle })
     })
-    const data = await response.json()
     if (!response.ok) {
       throw new Error("Unable to add Subscription")
     }
-    setName('');
-    setPrice('');
-    setCategory('');
-    setBillingCycle('');
-    toggleField()
-    getSubscriptions();
   }
+
+  setName('');
+  setPrice('');
+  setCategory('');
+  setBillingCycle('');
+  setEditingId(null);
+  setShowForm(false);
+  getSubscriptions();
+}
 
   async function deleteSubscription(id) {
     const token = localStorage.getItem("token");
@@ -63,6 +80,15 @@ function Subscriptions({ toggleDark, isDark }) {
     getSubscriptions();
   }
 
+  function startEdit(sub){
+    setEditingId(sub.id);
+    setName(sub.name);
+    setPrice(sub.price);
+    setCategory(sub.category);
+    setBillingCycle(sub.billingCycle);
+    setShowForm(true);
+  }
+
   function logout() {
     localStorage.removeItem('token')
     navigate("/login")
@@ -70,6 +96,11 @@ function Subscriptions({ toggleDark, isDark }) {
 
   function toggleField() {
     setShowForm(prev => !prev);
+    setName('');
+    setPrice('');
+    setCategory('');
+    setBillingCycle('');
+    setEditingId(null);
   }
 
   useEffect(() => {
@@ -97,11 +128,18 @@ function Subscriptions({ toggleDark, isDark }) {
               <p className="font-bold">{sub.name}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">${sub.price} · {sub.category} · {sub.billingCycle}</p>
             </div>
+            <div className="flex gap-2">
+            <button
+              onClick={() => startEdit(sub)}
+              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+              Edit
+            </button>
             <button
               onClick={() => deleteSubscription(sub.id)}
               className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
               Delete
             </button>
+            </div>
           </div>
         ))}
       </ul>
@@ -114,7 +152,7 @@ function Subscriptions({ toggleDark, isDark }) {
         </button>
 
         {showForm && (
-          <form onSubmit={addSubscription} className="bg-white dark:bg-gray-800 p-6 rounded shadow flex flex-col gap-4 w-96">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded shadow flex flex-col gap-4 w-96">
             <div className="flex flex-col">
               <label className="mb-1 text-sm font-medium">Name:</label>
               <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
