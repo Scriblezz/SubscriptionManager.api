@@ -7,7 +7,7 @@ function Login({ toggleDark, isDark }) {
     const navigate = useNavigate()
     async function handleSubmit(e) {
         e.preventDefault();
-        const response = await fetch('http://localhost:5001/api/Auth/login', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

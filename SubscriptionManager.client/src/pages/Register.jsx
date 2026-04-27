@@ -9,7 +9,7 @@ function Register({ toggleDark, isDark}) {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        const response = await fetch('http://localhost:5001/api/Auth/register', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

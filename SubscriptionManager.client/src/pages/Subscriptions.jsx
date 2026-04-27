@@ -16,7 +16,7 @@ function Subscriptions({ toggleDark, isDark }) {
   async function getSubscriptions() {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const response = await fetch('http://localhost:5001/api/Subscriptions', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Subscriptions`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`
@@ -36,7 +36,7 @@ function Subscriptions({ toggleDark, isDark }) {
     const token = localStorage.getItem("token");
 
     if (editingId) {
-      const response = await fetch(`http://localhost:5001/api/Subscriptions/${editingId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Subscriptions/${editingId}`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ function Subscriptions({ toggleDark, isDark }) {
       }
       toast.success('Subscription updated!')
     } else {
-      const response = await fetch("http://localhost:5001/api/Subscriptions", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Subscriptions`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ function Subscriptions({ toggleDark, isDark }) {
 
   async function deleteSubscription(id) {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:5001/api/Subscriptions/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Subscriptions/${id}`, {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ function Subscriptions({ toggleDark, isDark }) {
 
   async function renewSubscription(id) {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:5001/api/Subscriptions/${id}/renew`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Subscriptions/${id}/renew`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
