@@ -1,30 +1,68 @@
-# SubscriptionManager.Api
+# SubscriptionManager
 
-A RESTful API for managing personal subscriptions, built with ASP.NET Core and PostgreSQL. Users can register, log in, and manage their own subscriptions — with full filtering, sorting, and pagination support.
+A full stack subscription management app built with ASP.NET Core, React, and PostgreSQL. Users can register, log in, and manage their personal subscriptions with a clean, responsive UI that supports dark mode.
 
 ---
 
 ## Features
 
+### Backend
 - JWT-based authentication (register, login)
 - User-scoped subscriptions — each user only sees their own data
-- Full CRUD for subscriptions
+- Full CRUD for subscriptions (create, read, update, delete)
+- Subscription renewal logic with billing cycle support (Weekly, Monthly, Yearly)
 - Filtering by category and active status
 - Sorting by name, price, or next renewal date
 - Pagination support
-- Subscription renewal logic with billing cycle support (Weekly, Monthly, Yearly)
 - Global exception handling middleware
+- Proper HTTP status codes (401 for unauthorized, 404 for not found, 400 for bad requests)
+
+### Frontend
+- Login and registration pages
+- View all subscriptions with next renewal date
+- Add, edit, and delete subscriptions
+- Renew subscriptions (only shown for active subscriptions)
+- Dark mode toggle across all pages
+- Billing cycle dropdown to prevent invalid input
+- Responsive layout with Tailwind CSS
 
 ---
 
 ## Tech Stack
 
+### Backend
 - **ASP.NET Core 9** — Web API
 - **Entity Framework Core** — ORM
 - **PostgreSQL 16** — Database (via Docker)
 - **BCrypt.Net** — Password hashing
 - **JWT Bearer** — Authentication
 - **Swagger / Swashbuckle** — API documentation
+
+### Frontend
+- **React 19** — UI framework
+- **Vite** — Build tool
+- **Tailwind CSS** — Styling
+- **React Router** — Client-side routing
+
+---
+
+## Project Structure
+
+```
+SubscriptionManager/
+├── SubscriptionManager.api/        # ASP.NET Core Web API
+│   └── SubscriptionManager.Api/
+│       ├── Controllers/            # API endpoints
+│       ├── DTO/                    # Request and response models
+│       ├── Entities/               # Database models
+│       ├── Exceptions/             # Custom exception classes
+│       ├── Middleware/             # Global exception handling
+│       ├── Migrations/             # EF Core migrations
+│       └── Services/               # Business logic
+└── SubscriptionManager.client/     # React frontend
+    └── src/
+        └── pages/                  # Login, Register, Subscriptions
+```
 
 ---
 
@@ -34,6 +72,7 @@ A RESTful API for managing personal subscriptions, built with ASP.NET Core and P
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Node.js 22+](https://nodejs.org)
 
 ### 1. Clone the repository
 
@@ -44,7 +83,7 @@ cd SubscriptionManager.api
 
 ### 2. Set up the database
 
-Create a `.env` file in the root of the repository with the following values:
+Create a `.env` file in the root of the repository:
 
 ```env
 POSTGRES_USER=postgres
@@ -58,12 +97,12 @@ Then start the PostgreSQL container:
 docker-compose up -d
 ```
 
-### 3. Configure user secrets
+### 3. Configure API user secrets
 
 Navigate to the API project folder and set the required JWT secrets:
 
 ```bash
-cd SubscriptionManager.Api
+cd SubscriptionManager.api/SubscriptionManager.Api
 dotnet user-secrets init
 dotnet user-secrets set "Jwt:Key" "your-secret-key-at-least-32-characters-long"
 dotnet user-secrets set "Jwt:Issuer" "SubscriptionManagerApi"
@@ -72,7 +111,7 @@ dotnet user-secrets set "Jwt:Audience" "SubscriptionManagerClient"
 
 ### 4. Update the connection string
 
-In `appsettings.json`, update the connection string to match your `.env` values:
+In `SubscriptionManager.api/SubscriptionManager.Api/appsettings.json`, update the connection string to match your `.env` values:
 
 ```json
 "ConnectionStrings": {
@@ -93,6 +132,18 @@ dotnet run
 ```
 
 The API will be available at `http://localhost:5001`. Swagger UI is available at `http://localhost:5001/swagger`.
+
+### 7. Run the frontend
+
+In a new terminal:
+
+```bash
+cd SubscriptionManager.client
+npm install
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
 
 ---
 
@@ -140,23 +191,9 @@ This API uses JWT Bearer authentication.
 
 ---
 
-## Project Structure
-
-```
-SubscriptionManager.Api/
-├── Controllers/        # API endpoints
-├── DTO/                # Request and response models
-├── Entities/           # Database models
-├── Exceptions/         # Custom exception classes
-├── Middleware/         # Global exception handling
-├── Migrations/         # EF Core migrations
-└── Services/           # Business logic
-```
-
----
-
 ## Security Notes
 
 - Passwords are hashed using BCrypt before being stored
 - JWT secrets are stored using .NET User Secrets (never committed to source control)
 - All subscription endpoints are user-scoped — users cannot access each other's data
+- Invalid login attempts return 401 Unauthorized without revealing whether the email exists
