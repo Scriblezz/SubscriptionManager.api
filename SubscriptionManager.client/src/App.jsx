@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Subscriptions from './pages/Subscriptions'
@@ -26,6 +27,7 @@ function App() {
 
   return (
     <div className={isDark ? 'dark' : ''}>
+      <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />

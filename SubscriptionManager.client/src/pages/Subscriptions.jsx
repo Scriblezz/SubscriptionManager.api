@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Subscriptions({ toggleDark, isDark }) {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -9,7 +10,6 @@ function Subscriptions({ toggleDark, isDark }) {
   const [billingCycle, setBillingCycle] = useState('')
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [error, setError] = useState('');
   const navigate = useNavigate()
 
   async function getSubscriptions() {
@@ -21,7 +21,8 @@ function Subscriptions({ toggleDark, isDark }) {
       }
     })
     if (!response.ok) {
-      throw new Error("Unable to fetch Subscriptions")
+      toast.error("Unable to fetch Subscriptions")
+      return
     }
     const data = await response.json();
     setSubscriptions(data.items);
@@ -41,8 +42,10 @@ function Subscriptions({ toggleDark, isDark }) {
         body: JSON.stringify({ name, price, category, billingCycle })
       })
       if (!response.ok) {
-        throw new Error("Unable to edit Subscription")
+        toast.error("Unable to edit Subscription")
+        return
       }
+      toast.success('Subscription updated!')
     } else {
       const response = await fetch("http://localhost:5001/api/Subscriptions", {
         method: "POST",
@@ -53,8 +56,10 @@ function Subscriptions({ toggleDark, isDark }) {
         body: JSON.stringify({ name, price, category, billingCycle })
       })
       if (!response.ok) {
-        throw new Error("Unable to add Subscription")
+        toast.error("Unable to add Subscription")
+        return
       }
+      toast.success('Subscription added!')
     }
 
     setName('');
@@ -76,8 +81,10 @@ function Subscriptions({ toggleDark, isDark }) {
       }
     })
     if (!response.ok) {
-      throw new Error("Unable to delete Subscription")
+      toast.error("Unable to delete Subscription")
+      return
     }
+    toast.success('Subscription deleted!')
     getSubscriptions();
   }
 
@@ -92,10 +99,10 @@ function Subscriptions({ toggleDark, isDark }) {
     })
     if (!response.ok) {
       const data = await response.json()
-      setError(data.message || "Unable to renew Subscription")
+      toast.error(data.message || "Unable to renew Subscription")
       return
     }
-    setError('');
+    toast.success('Subscription renewed!')
     getSubscriptions();
   }
 
@@ -139,9 +146,8 @@ function Subscriptions({ toggleDark, isDark }) {
           </button>
         </div>
       </div>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
       <ul className="flex flex-col gap-4">
-        {subscriptions.map((sub) => (console.log(sub.nextRenewalDate),
+        {subscriptions.map((sub) => (
           <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center">
             <div>
               <p className="font-bold">{sub.name}</p>
@@ -149,7 +155,7 @@ function Subscriptions({ toggleDark, isDark }) {
               <p className="text-sm text-gray-500 dark:text-gray-400">Next Renewal: {new Date(sub.nextRenewalDate).toLocaleDateString("en-US")}</p>
             </div>
             <div className="flex gap-2">
-              {sub.isActive && (
+              {sub.isActive && new Date(sub.nextRenewalDate) < new Date() && (
                 <button
                   onClick={() => renewSubscription(sub.id)}
                   className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
