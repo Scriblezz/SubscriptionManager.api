@@ -4,6 +4,10 @@ A full stack subscription management app built with ASP.NET Core, React, and Pos
 
 ---
 
+## Live Demo
+- **Frontend:** https://subscription-manager-api-azure.vercel.app
+- **API:** https://subscriptionmanagerapi-production.up.railway.app
+
 ## Features
 
 ### Backend
