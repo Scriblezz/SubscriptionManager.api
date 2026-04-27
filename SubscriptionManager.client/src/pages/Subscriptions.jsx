@@ -9,6 +9,7 @@ function Subscriptions({ toggleDark, isDark }) {
   const [billingCycle, setBillingCycle] = useState('')
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [error, setError] = useState('');
   const navigate = useNavigate()
 
   async function getSubscriptions() {
@@ -25,45 +26,45 @@ function Subscriptions({ toggleDark, isDark }) {
     const data = await response.json();
     setSubscriptions(data.items);
   }
-  
-async function handleSubmit(e) {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
 
-  if (editingId) {
-    const response = await fetch(`http://localhost:5001/api/Subscriptions/${editingId}`, {
-      method: "PUT",
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, price, category, billingCycle })
-    })
-    if (!response.ok) {
-      throw new Error("Unable to edit Subscription")
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    if (editingId) {
+      const response = await fetch(`http://localhost:5001/api/Subscriptions/${editingId}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, price, category, billingCycle })
+      })
+      if (!response.ok) {
+        throw new Error("Unable to edit Subscription")
+      }
+    } else {
+      const response = await fetch("http://localhost:5001/api/Subscriptions", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, price, category, billingCycle })
+      })
+      if (!response.ok) {
+        throw new Error("Unable to add Subscription")
+      }
     }
-  } else {
-    const response = await fetch("http://localhost:5001/api/Subscriptions", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, price, category, billingCycle })
-    })
-    if (!response.ok) {
-      throw new Error("Unable to add Subscription")
-    }
+
+    setName('');
+    setPrice('');
+    setCategory('');
+    setBillingCycle('');
+    setEditingId(null);
+    setShowForm(false);
+    getSubscriptions();
   }
-
-  setName('');
-  setPrice('');
-  setCategory('');
-  setBillingCycle('');
-  setEditingId(null);
-  setShowForm(false);
-  getSubscriptions();
-}
 
   async function deleteSubscription(id) {
     const token = localStorage.getItem("token");
@@ -80,7 +81,25 @@ async function handleSubmit(e) {
     getSubscriptions();
   }
 
-  function startEdit(sub){
+  async function renewSubscription(id) {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`http://localhost:5001/api/Subscriptions/${id}/renew`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    })
+    if (!response.ok) {
+      const data = await response.json()
+      setError(data.message || "Unable to renew Subscription")
+      return
+    }
+    setError('');
+    getSubscriptions();
+  }
+
+  function startEdit(sub) {
     setEditingId(sub.id);
     setName(sub.name);
     setPrice(sub.price);
@@ -120,25 +139,33 @@ async function handleSubmit(e) {
           </button>
         </div>
       </div>
-
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <ul className="flex flex-col gap-4">
-        {subscriptions.map((sub) => (
+        {subscriptions.map((sub) => (console.log(sub.nextRenewalDate),
           <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center">
             <div>
               <p className="font-bold">{sub.name}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">${sub.price} · {sub.category} · {sub.billingCycle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Next Renewal: {new Date(sub.nextRenewalDate).toLocaleDateString("en-US")}</p>
             </div>
             <div className="flex gap-2">
-            <button
-              onClick={() => startEdit(sub)}
-              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-              Edit
-            </button>
-            <button
-              onClick={() => deleteSubscription(sub.id)}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-              Delete
-            </button>
+              {sub.isActive && (
+                <button
+                  onClick={() => renewSubscription(sub.id)}
+                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                  Renew
+                </button>
+              )}
+              <button
+                onClick={() => startEdit(sub)}
+                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                Edit
+              </button>
+              <button
+                onClick={() => deleteSubscription(sub.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                Delete
+              </button>
             </div>
           </div>
         ))}
@@ -173,9 +200,15 @@ async function handleSubmit(e) {
             </div>
             <div className="flex flex-col">
               <label className="mb-1 text-sm font-medium">Billing Cycle:</label>
-              <input className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                type="text" placeholder="Monthly" value={billingCycle}
-                onChange={(e) => setBillingCycle(e.target.value)} />
+              <select
+                className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                value={billingCycle}
+                onChange={(e) => setBillingCycle(e.target.value)}>
+                <option value="">Select a billing cycle</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
             </div>
             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
               Save Subscription
