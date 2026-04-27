@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 function Register({ toggleDark, isDark}) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
     const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault();
-        setError('');
         const response = await fetch('http://localhost:5001/api/Auth/register', {
             method: 'POST',
             headers: {
@@ -21,10 +20,11 @@ function Register({ toggleDark, isDark}) {
         const data = await response.json()
 
         if (!response.ok) {
-            setError(data.message || "Failed to Register")
+            toast.error(data.message || "Failed to Register")
             return
         }
 
+        toast.success("Registration successful")
         navigate('/login')
     }
     
@@ -64,7 +64,6 @@ function Register({ toggleDark, isDark}) {
                     type="submit">Submit</button>
                 </div>
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
         </div>
     )
