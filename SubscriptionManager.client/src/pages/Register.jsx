@@ -33,7 +33,7 @@ function Register({ toggleDark, isDark}) {
         <button
             onClick={toggleDark}
             className="absolute top-4 right-4 bg-gray-200 dark:bg-gray-700 dark:text-white px-3 py-1 rounded">
-                {isDark ? 'Dark Mode' : 'Light Mode'}
+                {isDark ? 'Light Mode' : 'Dark Mode'}
             </button>
         <div className="bg-white dark:bg-gray-800 p-8 rounded shadow-md dark:text-white">
                 <h1 className="text-3xl font-bold mb-6">Register</h1>
