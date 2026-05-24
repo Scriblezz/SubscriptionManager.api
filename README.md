@@ -9,7 +9,7 @@ SubTrack helps users monitor spending on subscriptions by tracking price, billin
 - **Frontend:** https://subscription-manager-api-azure.vercel.app
 - **API:** https://subscriptionmanagerapi-production.up.railway.app
 
-![Subscriptions Page](docs/screenshots/subscriptions.png)
+![Subscriptions Page](docs/screenshots/preview.webp)
 
 ## Features
 
