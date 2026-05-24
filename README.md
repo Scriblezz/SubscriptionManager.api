@@ -1,12 +1,15 @@
-# SubscriptionManager
+# SubTrack
 
 SubTrack helps users monitor spending on subscriptions by tracking price, billing cycle and renewal date. Users get a unified place to manage their subscriptions and know exactly where their money is going.
 
 ---
 
+
 ## Live Demo
 - **Frontend:** https://subscription-manager-api-azure.vercel.app
 - **API:** https://subscriptionmanagerapi-production.up.railway.app
+
+![Subscriptions Page](docs/screenshots/subscriptions.png)
 
 ## Features
 
