@@ -136,6 +136,21 @@ function Subscriptions({ toggleDark, isDark }) {
     getSubscriptions();
   }, [])
 
+  function getRenewalBorderClass(nextRenewalDate) {
+    const today = new Date();
+    const renewalDate = new Date(nextRenewalDate);
+    const daysUntilRenewal = (renewalDate - today) / (1000 * 60 * 60 * 24);
+
+    if (daysUntilRenewal < 0) {
+      return "";
+    } else if (daysUntilRenewal <= 10) {
+      return "border-l-4 border-red-500";
+    } else if (daysUntilRenewal <= 30) {
+      return "border-l-4 border-yellow-500";
+    } else {
+      return "border-l-4 border-green-500";
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white p-8">
       <div className="flex justify-between items-center mb-8">
@@ -157,7 +172,7 @@ function Subscriptions({ toggleDark, isDark }) {
       ) : (
         <ul className="flex flex-col gap-4">
           {subscriptions.map((sub) => (
-            <div key={sub.id} className="bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center">
+            <div key={sub.id} className={`bg-white dark:bg-gray-800 p-4 rounded shadow flex justify-between items-center ${getRenewalBorderClass(sub.nextRenewalDate)}`}>
               <div>
                 <p className="font-bold">{sub.name}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">${sub.price} · {sub.category} · {sub.billingCycle}</p>

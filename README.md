@@ -1,6 +1,6 @@
 # SubscriptionManager
 
-A full stack subscription management app built with ASP.NET Core, React, and PostgreSQL. Users can register, log in, and manage their personal subscriptions with a clean, responsive UI that supports dark mode.
+SubTrack helps users monitor spending on subscriptions by tracking price, billing cycle and renewal date. Users get a unified place to manage their subscriptions and know exactly where their money is going.
 
 ---
 
