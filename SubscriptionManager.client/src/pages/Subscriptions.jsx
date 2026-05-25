@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { getMonthlyCost } from '../utils/subscriptionUtils'
+import { getMonthlyCost } from '../utils/SubscriptionUtils'
 import SubscriptionChart from "../components/SubscriptionChart";
 
 function Subscriptions({ toggleDark, isDark }) {
