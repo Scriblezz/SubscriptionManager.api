@@ -1,4 +1,4 @@
-import { getMonthlyCost } from '../utils/subscriptionUtils'
+import { getMonthlyCost } from '../utils/SubscriptionUtils'
 import { Bar } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
