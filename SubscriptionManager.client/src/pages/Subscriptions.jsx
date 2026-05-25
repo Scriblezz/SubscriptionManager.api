@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getMonthlyCost } from '../utils/subscriptionUtils'
+import SubscriptionChart from "../components/SubscriptionChart";
 
 function Subscriptions({ toggleDark, isDark }) {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -12,6 +14,7 @@ function Subscriptions({ toggleDark, isDark }) {
   const [editingId, setEditingId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate()
+  const [chartVisible, setChartVisible] = useState(false);
 
   async function getSubscriptions() {
     setIsLoading(true);
@@ -151,6 +154,7 @@ function Subscriptions({ toggleDark, isDark }) {
       return "border-l-4 border-green-500";
     }
   }
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white p-8">
       <div className="flex justify-between items-center mb-8">
@@ -203,6 +207,33 @@ function Subscriptions({ toggleDark, isDark }) {
       )}
 
       <div className="mt-6 flex justify-end">
+        <div className="flex gap-2">
+        <button
+          onClick={() => setChartVisible(true)}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">
+          {"View Analytics"}
+        </button>
+        {chartVisible && (
+          <>
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setChartVisible(false)}
+            />
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-gray-800 rounded shadow-xl p-6 w-3/4 max-w-3xl">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Spending Analytics</h2>
+                  <button
+                    onClick={() => setChartVisible(false)}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400">
+                    ✕
+                  </button>
+                </div>
+                <SubscriptionChart subscriptions={subscriptions} />
+              </div>
+            </div>
+          </>
+        )}
         <button
           onClick={toggleField}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4">
@@ -256,6 +287,7 @@ function Subscriptions({ toggleDark, isDark }) {
                 Save Subscription
               </button>
             </form>
+            </div>
           </div>
         </div>
       </div>

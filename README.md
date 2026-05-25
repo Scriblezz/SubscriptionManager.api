@@ -10,6 +10,7 @@ SubTrack helps users monitor spending on subscriptions by tracking price, billin
 - **API:** https://subscriptionmanagerapi-production.up.railway.app
 
 ![Subscriptions Page](docs/screenshots/preview.webp)
+![Spending Analytics](docs/screenshots/Analytics.webp)
 
 ## Features
 
