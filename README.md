@@ -4,7 +4,6 @@ SubTrack helps users monitor spending on subscriptions by tracking price, billin
 
 ---
 
-
 ## Live Demo
 - **Frontend:** https://subscription-manager-api-azure.vercel.app
 - **API:** https://subscriptionmanagerapi-production.up.railway.app
@@ -30,6 +29,8 @@ SubTrack helps users monitor spending on subscriptions by tracking price, billin
 - View all subscriptions with next renewal date
 - Add, edit, and delete subscriptions
 - Renew subscriptions (only shown for active subscriptions)
+- Color-coded renewal urgency indicators (green, yellow, red based on days remaining)
+- Spending analytics modal with monthly and yearly cost breakdown per subscription
 - Dark mode toggle across all pages
 - Billing cycle dropdown to prevent invalid input
 - Responsive layout with Tailwind CSS
@@ -51,6 +52,7 @@ SubTrack helps users monitor spending on subscriptions by tracking price, billin
 - **Vite** — Build tool
 - **Tailwind CSS** — Styling
 - **React Router** — Client-side routing
+- **chart.js / react-chartjs-2** — Data visualization
 
 ---
 
