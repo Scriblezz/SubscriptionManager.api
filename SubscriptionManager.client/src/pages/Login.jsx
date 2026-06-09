@@ -30,7 +30,7 @@ function Login({ toggleDark, isDark }) {
     }
     return (
 
-        <div className="relative flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="relative flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
             <button
                 onClick={toggleDark}
                 className="absolute top-4 right-4 bg-gray-200 dark:bg-gray-700 dark:text-white px-3 py-1 rounded">
