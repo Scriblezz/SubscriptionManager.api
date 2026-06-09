@@ -26,7 +26,7 @@ function App() {
   }, [])
 
   return (
-    <div className={isDark ? 'dark' : ''}>
+    <div className={isDark ? 'dark min-h-screen' : 'min-h-screen'}>
       <Toaster position="bottom-right" />
       <BrowserRouter>
         <Routes>
