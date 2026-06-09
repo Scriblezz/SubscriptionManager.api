@@ -4,4 +4,6 @@
 html, body {
   overscroll-behavior: none;
   height: 100%;
+  position: fixed;
+  width: 100%;
 }
